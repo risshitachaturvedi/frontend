@@ -1,0 +1,21 @@
+/* Reset default styles */
+html,
+body {
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+#root {
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+}
+
+canvas {
+  display: block; /* Remove inline spacing */
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  touch-action: none; /* Prevent touch actions like scrolling on mobile */
+}
