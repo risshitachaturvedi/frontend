@@ -3,7 +3,7 @@ import ShoppingRack from "./components/ShoppingRack";
 import Door from "./components/Door";
 import BillingCounter from "./components/BillingCounter";
 import SensorPermission from "./components/SensorPermission";
-import ImuDisplay from "./components/ImuDisplay"; // Removed backend logic for IMU display
+//import ImuDisplay from "./components/ImuDisplay"; // Removed backend logic for IMU display
 import ErrorBoundary from "./components/ErrorBoundary"; // Retained for error handling
 
 const App = () => {
@@ -20,15 +20,15 @@ const App = () => {
 
   return (
     <div>
-      <SensorPermission />
+      <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
       <div />
       <Canvas camera={{ position: [0, 20, 20], fov: 60 }}>
         {/* Your scene components */}
         <ambientLight />
         <pointLight position={[10, 20, 10]} intensity={1} />
-        <Avatar />
-        {/* Other components */}
+        {isPermissionGranted && <Avatar />}
 
+        {/* Other components */}
         <Floor />
         {/* Add the walls around the floor */}
         <Wall floorSize={floorSize} side="top" />

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Avatar from "./Avatar"; // Import Avatar component
 
-const SensorPermission = () => {
-  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
+const SensorPermission = ({ setIsPermissionGranted }) => {
+  // const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [sensorData, setSensorData] = useState({
     accelerometer: { x: 0, y: 0, z: 0 },
     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
