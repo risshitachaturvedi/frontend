@@ -10,8 +10,8 @@ import { Canvas } from "@react-three/fiber";
 import ErrorBoundary from "./components/ErrorBoundary"; // Retained for error handling
 
 const App = () => {
-  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // To track the loading state of the map
+  const [isPermissionGranted, setIsPermissionGranted] = useState(false); // Added state for permission
   const floorSize = [88, 100];
 
   // For ShoppingRack
@@ -27,12 +27,21 @@ const App = () => {
     setIsLoading(false); // Set loading to false when the map is loaded
   };
 
-  alert("You clicked the button!");
+  const onPermissionGranted = () => {
+    setIsPermissionGranted(true);
+    setIsLoading(false); // Set isLoading to false once permission is granted
+  };
 
   return (
     <div>
       <div>
-        <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
+        <button
+          className="z-10"
+          onClick={() => alert("You clicked the button!")}
+        >
+          hii
+        </button>
+        <SensorPermission onPermissionGranted={onPermissionGranted} />
         <div />
         {isLoading && <Loading />}
         {/* Show Loading component if the map is still loading */}
