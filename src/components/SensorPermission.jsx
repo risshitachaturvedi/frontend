@@ -1,3 +1,4 @@
+//After adding kalman filter, velocity and position to code
 //after adding sensor data to ui
 import React, { useState, useEffect } from "react";
 
@@ -102,6 +103,111 @@ const SensorPermission = () => {
 };
 
 export default SensorPermission;
+
+// //after adding sensor data to ui
+// import React, { useState, useEffect } from "react";
+
+// const SensorPermission = () => {
+//   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
+//   const [sensorData, setSensorData] = useState({
+//     accelerometer: { x: 0, y: 0, z: 0 },
+//     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
+//   });
+
+//   // Function to request permission
+//   const requestPermission = async () => {
+//     if (typeof DeviceMotionEvent.requestPermission === "function") {
+//       try {
+//         const permission = await DeviceMotionEvent.requestPermission();
+//         if (permission === "granted") {
+//           setIsPermissionGranted(true);
+//           startSensorListeners();
+//         } else {
+//           alert("Permission denied. Cannot access sensors.");
+//         }
+//       } catch (error) {
+//         console.error("Error requesting permission:", error);
+//       }
+//     } else {
+//       setIsPermissionGranted(true); // For Android devices (no explicit permission required)
+//       startSensorListeners();
+//     }
+//   };
+
+//   // Function to start listening to sensor data
+//   const startSensorListeners = () => {
+//     window.addEventListener("devicemotion", handleMotionEvent);
+//     window.addEventListener("deviceorientation", handleOrientationEvent);
+//   };
+
+//   // Function to handle motion sensor data
+//   const handleMotionEvent = (event) => {
+//     const acceleration = event.acceleration || {};
+//     setSensorData((prevData) => ({
+//       ...prevData,
+//       accelerometer: {
+//         x: acceleration.x?.toFixed(2) || 0,
+//         y: acceleration.y?.toFixed(2) || 0,
+//         z: acceleration.z?.toFixed(2) || 0,
+//       },
+//     }));
+//   };
+
+//   // Function to handle gyroscope/orientation data
+//   const handleOrientationEvent = (event) => {
+//     const { alpha, beta, gamma } = event;
+//     setSensorData((prevData) => ({
+//       ...prevData,
+//       gyroscope: {
+//         alpha: alpha?.toFixed(2) || 0,
+//         beta: beta?.toFixed(2) || 0,
+//         gamma: gamma?.toFixed(2) || 0,
+//       },
+//     }));
+//   };
+
+//   // Cleanup event listeners when component unmounts
+//   useEffect(() => {
+//     return () => {
+//       window.removeEventListener("devicemotion", handleMotionEvent);
+//       window.removeEventListener("deviceorientation", handleOrientationEvent);
+//     };
+//   }, []);
+
+//   return (
+//     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white p-4">
+//       <h1 className="text-2xl font-bold mb-4">Sensor Permission</h1>
+
+//       {!isPermissionGranted ? (
+//         <button
+//           onClick={requestPermission}
+//           className="bg-blue-500 px-4 py-2 rounded-lg text-white text-lg"
+//         >
+//           Grant Sensor Permission
+//         </button>
+//       ) : (
+//         <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+//           <h2 className="text-xl font-semibold">Sensor Data:</h2>
+//           <p className="mt-2">
+//             📡 <strong>Accelerometer</strong>
+//           </p>
+//           <p>X: {sensorData.accelerometer.x}</p>
+//           <p>Y: {sensorData.accelerometer.y}</p>
+//           <p>Z: {sensorData.accelerometer.z}</p>
+
+//           <p className="mt-4">
+//             🌀 <strong>Gyroscope</strong>
+//           </p>
+//           <p>Alpha: {sensorData.gyroscope.alpha}</p>
+//           <p>Beta: {sensorData.gyroscope.beta}</p>
+//           <p>Gamma: {sensorData.gyroscope.gamma}</p>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default SensorPermission;
 
 //before adding sensor data to ui
 // import React, { useState, useEffect } from "react";
