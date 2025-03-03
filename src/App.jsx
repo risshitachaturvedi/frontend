@@ -29,9 +29,9 @@ const App = () => {
 
   return (
     <div>
-      {/* <SensorPermission setIsPermissionGranted={setIsPermissionGranted} /> */}
+      <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
       <div />
-      {isLoading && <Loading />}{" "}
+      {isLoading && <Loading />}
       {/* Show Loading component if the map is still loading */}
       {/* Render the Canvas only if the map is not loading */}
       {isPermissionGranted && !isLoading && (
