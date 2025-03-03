@@ -1,20 +1,52 @@
-//after adding velocity and position
-const SensorPermission = ({ onPermissionGranted }) => {
+//After adding kalman filter, velocity and position to code
+import React, { useState, useEffect } from "react";
+
+// Kalman filter implementation for one-dimensional data
+class KalmanFilter {
+  constructor(Q = 0.0001, R = 0.01) {
+    this.Q = Q; // Process noise covariance
+    this.R = R; // Measurement noise covariance
+    this.P = 1; // Estimation error covariance
+    this.X = 0; // Estimated value
+    this.K = 0; // Kalman gain
+  }
+
+  update(measurement) {
+    // Prediction step
+    this.P = this.P + this.Q;
+
+    // Kalman Gain step
+    this.K = this.P / (this.P + this.R);
+
+    // Update estimate with measurement
+    this.X = this.X + this.K * (measurement - this.X);
+
+    // Update estimation error covariance
+    this.P = (1 - this.K) * this.P;
+
+    return this.X;
+  }
+}
+
+const SensorPermission = () => {
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [sensorData, setSensorData] = useState({
     accelerometer: { x: 0, y: 0, z: 0 },
     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
   });
 
+  // Velocity and position states
   const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
 
+  // Kalman filters for acceleration data
   const kalmanX = new KalmanFilter();
   const kalmanY = new KalmanFilter();
   const kalmanZ = new KalmanFilter();
 
-  let lastTime = Date.now();
+  let lastTime = Date.now(); // To calculate delta time
 
+  // Function to request permission
   const requestPermission = async () => {
     if (typeof DeviceMotionEvent.requestPermission === "function") {
       try {
@@ -42,10 +74,12 @@ const SensorPermission = ({ onPermissionGranted }) => {
   const handleMotionEvent = (event) => {
     const acceleration = event.acceleration || {};
 
+    // Apply Kalman filter to accelerometer data to reduce noise
     const filteredX = kalmanX.update(acceleration.x || 0);
     const filteredY = kalmanY.update(acceleration.y || 0);
     const filteredZ = kalmanZ.update(acceleration.z || 0);
 
+    // Update the accelerometer data
     setSensorData((prevData) => ({
       ...prevData,
       accelerometer: {
@@ -55,20 +89,15 @@ const SensorPermission = ({ onPermissionGranted }) => {
       },
     }));
 
+    // Calculate velocity and position based on filtered acceleration
     const currentTime = Date.now();
-    const deltaTime = (currentTime - lastTime) / 1000;
+    const deltaTime = (currentTime - lastTime) / 1000; // Time in seconds
     lastTime = currentTime;
 
-    const gravity = 9.8;
-
-    const filteredAccelX = filteredX;
-    const filteredAccelY = filteredY;
-    const filteredAccelZ = filteredZ - gravity;
-
     const newVelocity = {
-      x: velocity.x + filteredAccelX * deltaTime,
-      y: velocity.y + filteredAccelY * deltaTime,
-      z: velocity.z + filteredAccelZ * deltaTime,
+      x: velocity.x + filteredX * deltaTime,
+      y: velocity.y + filteredY * deltaTime,
+      z: velocity.z + filteredZ * deltaTime,
     };
 
     setVelocity(newVelocity);
@@ -80,9 +109,6 @@ const SensorPermission = ({ onPermissionGranted }) => {
     };
 
     setPosition(newPosition);
-
-    // Call onPermissionGranted with the new velocity and position data
-    onPermissionGranted(newVelocity, newPosition);
   };
 
   const handleOrientationEvent = (event) => {
@@ -117,7 +143,31 @@ const SensorPermission = ({ onPermissionGranted }) => {
       ) : (
         <div className="mt-4 p-4 bg-gray-800 rounded-lg">
           <h2 className="text-xl font-semibold">Sensor Data:</h2>
-          {/* Display sensor data */}
+          <p className="mt-2">
+            📡 <strong>Accelerometer</strong>
+          </p>
+          <p>X: {sensorData.accelerometer.x}</p>
+          <p>Y: {sensorData.accelerometer.y}</p>
+          <p>Z: {sensorData.accelerometer.z}</p>
+
+          <p className="mt-4">
+            🌀 <strong>Gyroscope</strong>
+          </p>
+          <p>Alpha: {sensorData.gyroscope.alpha}</p>
+          <p>Beta: {sensorData.gyroscope.beta}</p>
+          <p>Gamma: {sensorData.gyroscope.gamma}</p>
+
+          <div className="mt-4">
+            <h3 className="font-semibold">Velocity:</h3>
+            <p>X: {velocity.x.toFixed(2)}</p>
+            <p>Y: {velocity.y.toFixed(2)}</p>
+            <p>Z: {velocity.z.toFixed(2)}</p>
+
+            <h3 className="font-semibold mt-4">Position:</h3>
+            <p>X: {position.x.toFixed(2)}</p>
+            <p>Y: {position.y.toFixed(2)}</p>
+            <p>Z: {position.z.toFixed(2)}</p>
+          </div>
         </div>
       )}
     </div>
@@ -125,379 +175,6 @@ const SensorPermission = ({ onPermissionGranted }) => {
 };
 
 export default SensorPermission;
-
-// // after adding deltaTime
-// import React, { useState, useEffect } from "react";
-
-// // Kalman filter implementation for one-dimensional data
-// class KalmanFilter {
-//   constructor(Q = 0.0001, R = 0.01) {
-//     this.Q = Q; // Process noise covariance
-//     this.R = R; // Measurement noise covariance
-//     this.P = 1; // Estimation error covariance
-//     this.X = 0; // Estimated value
-//     this.K = 0; // Kalman gain
-//   }
-
-//   update(measurement) {
-//     // Prediction step
-//     this.P = this.P + this.Q;
-
-//     // Kalman Gain step
-//     this.K = this.P / (this.P + this.R);
-
-//     // Update estimate with measurement
-//     this.X = this.X + this.K * (measurement - this.X);
-
-//     // Update estimation error covariance
-//     this.P = (1 - this.K) * this.P;
-
-//     return this.X;
-//   }
-// }
-
-// const SensorPermission = () => {
-//   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
-//   const [sensorData, setSensorData] = useState({
-//     accelerometer: { x: 0, y: 0, z: 0 },
-//     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
-//   });
-
-//   // Velocity and position states
-//   const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
-//   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
-
-//   // Kalman filters for acceleration data
-//   const kalmanX = new KalmanFilter();
-//   const kalmanY = new KalmanFilter();
-//   const kalmanZ = new KalmanFilter();
-
-//   let lastTime = Date.now(); // To calculate delta time
-
-//   // Function to request permission
-//   const requestPermission = async () => {
-//     if (typeof DeviceMotionEvent.requestPermission === "function") {
-//       try {
-//         const permission = await DeviceMotionEvent.requestPermission();
-//         if (permission === "granted") {
-//           setIsPermissionGranted(true);
-//           startSensorListeners();
-//         } else {
-//           alert("Permission denied. Cannot access sensors.");
-//         }
-//       } catch (error) {
-//         console.error("Error requesting permission:", error);
-//       }
-//     } else {
-//       setIsPermissionGranted(true); // For Android devices (no explicit permission required)
-//       startSensorListeners();
-//     }
-//   };
-
-//   // Function to start listening to sensor data
-//   const startSensorListeners = () => {
-//     window.addEventListener("devicemotion", handleMotionEvent);
-//     window.addEventListener("deviceorientation", handleOrientationEvent);
-//   };
-
-//   // Function to handle motion sensor data
-//   const handleMotionEvent = (event) => {
-//     const acceleration = event.acceleration || {};
-
-//     // Apply Kalman filter to accelerometer data to reduce noise
-//     const filteredX = kalmanX.update(acceleration.x || 0);
-//     const filteredY = kalmanY.update(acceleration.y || 0);
-//     const filteredZ = kalmanZ.update(acceleration.z || 0);
-
-//     // Update the accelerometer data
-//     setSensorData((prevData) => ({
-//       ...prevData,
-//       accelerometer: {
-//         x: filteredX.toFixed(2),
-//         y: filteredY.toFixed(2),
-//         z: filteredZ.toFixed(2),
-//       },
-//     }));
-
-//     // Calculate velocity and position based on filtered acceleration
-//     const currentTime = Date.now();
-//     const deltaTime = (currentTime - lastTime) / 1000; // Time in seconds
-//     lastTime = currentTime;
-
-//     // Assuming gravity is ~9.8 m/s² along the z-axis and removing it from the Z axis for better acceleration calculation
-//     const gravity = 9.8;
-
-//     const filteredAccelX = filteredX; // Assuming X and Y axes have no gravity influence
-//     const filteredAccelY = filteredY;
-//     const filteredAccelZ = filteredZ - gravity; // Removing gravity from Z axis
-
-//     const newVelocity = {
-//       x: velocity.x + filteredAccelX * deltaTime,
-//       y: velocity.y + filteredAccelY * deltaTime,
-//       z: velocity.z + filteredAccelZ * deltaTime,
-//     };
-
-//     setVelocity(newVelocity);
-
-//     const newPosition = {
-//       x: position.x + newVelocity.x * deltaTime,
-//       y: position.y + newVelocity.y * deltaTime,
-//       z: position.z + newVelocity.z * deltaTime,
-//     };
-
-//     setPosition(newPosition);
-//   };
-
-//   // Function to handle gyroscope/orientation data
-//   const handleOrientationEvent = (event) => {
-//     const { alpha, beta, gamma } = event;
-//     setSensorData((prevData) => ({
-//       ...prevData,
-//       gyroscope: {
-//         alpha: alpha?.toFixed(2) || 0,
-//         beta: beta?.toFixed(2) || 0,
-//         gamma: gamma?.toFixed(2) || 0,
-//       },
-//     }));
-//   };
-
-//   // Cleanup event listeners when component unmounts
-//   useEffect(() => {
-//     return () => {
-//       window.removeEventListener("devicemotion", handleMotionEvent);
-//       window.removeEventListener("deviceorientation", handleOrientationEvent);
-//     };
-//   }, []);
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white p-4">
-//       <h1 className="text-2xl font-bold mb-4">Sensor Permission</h1>
-
-//       {!isPermissionGranted ? (
-//         <button
-//           onClick={requestPermission}
-//           className="bg-blue-500 px-4 py-2 rounded-lg text-white text-lg"
-//         >
-//           Grant Sensor Permission
-//         </button>
-//       ) : (
-//         <div className="mt-4 p-4 bg-gray-800 rounded-lg">
-//           <h2 className="text-xl font-semibold">Sensor Data:</h2>
-//           <p className="mt-2">
-//             📡 <strong>Accelerometer</strong>
-//           </p>
-//           <p>X: {sensorData.accelerometer.x}</p>
-//           <p>Y: {sensorData.accelerometer.y}</p>
-//           <p>Z: {sensorData.accelerometer.z}</p>
-
-//           <p className="mt-4">
-//             🌀 <strong>Gyroscope</strong>
-//           </p>
-//           <p>Alpha: {sensorData.gyroscope.alpha}</p>
-//           <p>Beta: {sensorData.gyroscope.beta}</p>
-//           <p>Gamma: {sensorData.gyroscope.gamma}</p>
-
-//           <div className="mt-4">
-//             <h3 className="font-semibold">Velocity:</h3>
-//             <p>X: {velocity.x.toFixed(2)}</p>
-//             <p>Y: {velocity.y.toFixed(2)}</p>
-//             <p>Z: {velocity.z.toFixed(2)}</p>
-
-//             <h3 className="font-semibold mt-4">Position:</h3>
-//             <p>X: {position.x.toFixed(2)}</p>
-//             <p>Y: {position.y.toFixed(2)}</p>
-//             <p>Z: {position.z.toFixed(2)}</p>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default SensorPermission;
-
-// //After adding kalman filter, velocity and position to code
-// import React, { useState, useEffect } from "react";
-
-// // Kalman filter implementation for one-dimensional data
-// class KalmanFilter {
-//   constructor(Q = 0.0001, R = 0.01) {
-//     this.Q = Q; // Process noise covariance
-//     this.R = R; // Measurement noise covariance
-//     this.P = 1; // Estimation error covariance
-//     this.X = 0; // Estimated value
-//     this.K = 0; // Kalman gain
-//   }
-
-//   update(measurement) {
-//     // Prediction step
-//     this.P = this.P + this.Q;
-
-//     // Kalman Gain step
-//     this.K = this.P / (this.P + this.R);
-
-//     // Update estimate with measurement
-//     this.X = this.X + this.K * (measurement - this.X);
-
-//     // Update estimation error covariance
-//     this.P = (1 - this.K) * this.P;
-
-//     return this.X;
-//   }
-// }
-
-// const SensorPermission = () => {
-//   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
-//   const [sensorData, setSensorData] = useState({
-//     accelerometer: { x: 0, y: 0, z: 0 },
-//     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
-//   });
-
-//   // Velocity and position states
-//   const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
-//   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
-
-//   // Kalman filters for acceleration data
-//   const kalmanX = new KalmanFilter();
-//   const kalmanY = new KalmanFilter();
-//   const kalmanZ = new KalmanFilter();
-
-//   let lastTime = Date.now(); // To calculate delta time
-
-//   // Function to request permission
-//   const requestPermission = async () => {
-//     if (typeof DeviceMotionEvent.requestPermission === "function") {
-//       try {
-//         const permission = await DeviceMotionEvent.requestPermission();
-//         if (permission === "granted") {
-//           setIsPermissionGranted(true);
-//           startSensorListeners();
-//         } else {
-//           alert("Permission denied. Cannot access sensors.");
-//         }
-//       } catch (error) {
-//         console.error("Error requesting permission:", error);
-//       }
-//     } else {
-//       setIsPermissionGranted(true); // For Android devices (no explicit permission required)
-//       startSensorListeners();
-//     }
-//   };
-
-//   // Function to start listening to sensor data
-//   const startSensorListeners = () => {
-//     window.addEventListener("devicemotion", handleMotionEvent);
-//     window.addEventListener("deviceorientation", handleOrientationEvent);
-//   };
-
-//   // Function to handle motion sensor data
-//   const handleMotionEvent = (event) => {
-//     const acceleration = event.acceleration || {};
-
-//     // Apply Kalman filter to accelerometer data to reduce noise
-//     const filteredX = kalmanX.update(acceleration.x || 0);
-//     const filteredY = kalmanY.update(acceleration.y || 0);
-//     const filteredZ = kalmanZ.update(acceleration.z || 0);
-
-//     // Update the accelerometer data
-//     setSensorData((prevData) => ({
-//       ...prevData,
-//       accelerometer: {
-//         x: filteredX.toFixed(2),
-//         y: filteredY.toFixed(2),
-//         z: filteredZ.toFixed(2),
-//       },
-//     }));
-
-//     // Calculate velocity and position based on filtered acceleration
-//     const currentTime = Date.now();
-//     const deltaTime = (currentTime - lastTime) / 1000; // Time in seconds
-//     lastTime = currentTime;
-
-//     const newVelocity = {
-//       x: velocity.x + filteredX * deltaTime,
-//       y: velocity.y + filteredY * deltaTime,
-//       z: velocity.z + filteredZ * deltaTime,
-//     };
-
-//     setVelocity(newVelocity);
-
-//     const newPosition = {
-//       x: position.x + newVelocity.x * deltaTime,
-//       y: position.y + newVelocity.y * deltaTime,
-//       z: position.z + newVelocity.z * deltaTime,
-//     };
-
-//     setPosition(newPosition);
-//   };
-
-//   // Function to handle gyroscope/orientation data
-//   const handleOrientationEvent = (event) => {
-//     const { alpha, beta, gamma } = event;
-//     setSensorData((prevData) => ({
-//       ...prevData,
-//       gyroscope: {
-//         alpha: alpha?.toFixed(2) || 0,
-//         beta: beta?.toFixed(2) || 0,
-//         gamma: gamma?.toFixed(2) || 0,
-//       },
-//     }));
-//   };
-
-//   // Cleanup event listeners when component unmounts
-//   useEffect(() => {
-//     return () => {
-//       window.removeEventListener("devicemotion", handleMotionEvent);
-//       window.removeEventListener("deviceorientation", handleOrientationEvent);
-//     };
-//   }, []);
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white p-4">
-//       <h1 className="text-2xl font-bold mb-4">Sensor Permission</h1>
-
-//       {!isPermissionGranted ? (
-//         <button
-//           onClick={requestPermission}
-//           className="bg-blue-500 px-4 py-2 rounded-lg text-white text-lg"
-//         >
-//           Grant Sensor Permission
-//         </button>
-//       ) : (
-//         <div className="mt-4 p-4 bg-gray-800 rounded-lg">
-//           <h2 className="text-xl font-semibold">Sensor Data:</h2>
-//           <p className="mt-2">
-//             📡 <strong>Accelerometer</strong>
-//           </p>
-//           <p>X: {sensorData.accelerometer.x}</p>
-//           <p>Y: {sensorData.accelerometer.y}</p>
-//           <p>Z: {sensorData.accelerometer.z}</p>
-
-//           <p className="mt-4">
-//             🌀 <strong>Gyroscope</strong>
-//           </p>
-//           <p>Alpha: {sensorData.gyroscope.alpha}</p>
-//           <p>Beta: {sensorData.gyroscope.beta}</p>
-//           <p>Gamma: {sensorData.gyroscope.gamma}</p>
-
-//           <div className="mt-4">
-//             <h3 className="font-semibold">Velocity:</h3>
-//             <p>X: {velocity.x.toFixed(2)}</p>
-//             <p>Y: {velocity.y.toFixed(2)}</p>
-//             <p>Z: {velocity.z.toFixed(2)}</p>
-
-//             <h3 className="font-semibold mt-4">Position:</h3>
-//             <p>X: {position.x.toFixed(2)}</p>
-//             <p>Y: {position.y.toFixed(2)}</p>
-//             <p>Z: {position.z.toFixed(2)}</p>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default SensorPermission;
 
 //after adding sensor data to ui
 // import React, { useState, useEffect } from "react";
