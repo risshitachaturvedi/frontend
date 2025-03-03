@@ -3,10 +3,13 @@ import ShoppingRack from "./components/ShoppingRack";
 import Door from "./components/Door";
 import BillingCounter from "./components/BillingCounter";
 import SensorPermission from "./components/SensorPermission";
+import Loading from "./components/Loading";
 //import ImuDisplay from "./components/ImuDisplay"; // Removed backend logic for IMU display
 import ErrorBoundary from "./components/ErrorBoundary"; // Retained for error handling
 
 const App = () => {
+  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // To track the loading state of the map
   const floorSize = [88, 100];
 
   // For ShoppingRack
@@ -18,10 +21,16 @@ const App = () => {
   const numCounters = 9; // Number of counters
   const counterSpacing = 10; // Spacing between counters in the row
 
+  const handleMapLoaded = () => {
+    setIsLoading(false); // Set loading to false when the map is loaded
+  };
+
   return (
     <div>
       <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
       <div />
+      {isLoading && <Loading />}{" "}
+      {/* Show Loading component if the map is still loading */}
       <Canvas camera={{ position: [0, 20, 20], fov: 60 }}>
         {/* Your scene components */}
         <ambientLight />
