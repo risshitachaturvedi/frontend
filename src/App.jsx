@@ -27,73 +27,77 @@ const App = () => {
     setIsLoading(false); // Set loading to false when the map is loaded
   };
 
+  alert("You clicked the button!");
+
   return (
     <div>
-      <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
-      <div />
-      {isLoading && <Loading />}
-      {/* Show Loading component if the map is still loading */}
-      {/* Render the Canvas only if the map is not loading */}
-      {isPermissionGranted && !isLoading && (
-        <Canvas
-          camera={{ position: [0, 20, 20], fov: 60 }}
-          onCreated={() => handleMapLoaded()}
-        >
-          {/* Your scene components */}
-          <ambientLight />
-          <pointLight position={[10, 20, 10]} intensity={1} />
-          {isPermissionGranted && <Avatar />}
+      <div>
+        <SensorPermission setIsPermissionGranted={setIsPermissionGranted} />
+        <div />
+        {isLoading && <Loading />}
+        {/* Show Loading component if the map is still loading */}
+        {/* Render the Canvas only if the map is not loading */}
+        {isPermissionGranted && !isLoading && (
+          <Canvas
+            camera={{ position: [0, 20, 20], fov: 60 }}
+            onCreated={() => handleMapLoaded()}
+          >
+            {/* Your scene components */}
+            <ambientLight />
+            <pointLight position={[10, 20, 10]} intensity={1} />
+            {isPermissionGranted && <Avatar />}
 
-          {/* Other components */}
-          <Floor />
-          {/* Add the walls around the floor */}
-          <Wall floorSize={floorSize} side="top" />
-          <Wall floorSize={floorSize} side="bottom" />
-          <Wall floorSize={floorSize} side="left" />
-          <Wall floorSize={floorSize} side="right" />
+            {/* Other components */}
+            <Floor />
+            {/* Add the walls around the floor */}
+            <Wall floorSize={floorSize} side="top" />
+            <Wall floorSize={floorSize} side="bottom" />
+            <Wall floorSize={floorSize} side="left" />
+            <Wall floorSize={floorSize} side="right" />
 
-          {/* Render the first Door at one position */}
-          <Door
-            position={[-40, 2.5, -47]}
-            rotation={[0, 8, 0]}
-            scale={[0.02, 0.02, 0.02]}
-          />
-          {/* Render the second Door at another position */}
-          <Door
-            position={[40, 3, -30]}
-            rotation={[0, 8, 0]}
-            scale={[0.02, 0.02, 0.02]}
-          />
-          {/* Multiple Rows (Columns) of Shopping Racks */}
-          {Array.from({ length: numRows }).map((_, rowIndex) =>
-            Array.from({ length: numRacksPerRow }).map((_, colIndex) => {
-              const rackNumber = rowIndex * numRacksPerRow + colIndex;
-
-              return (
-                <ShoppingRack
-                  key={`rack-${rackNumber}`}
-                  position={[
-                    colIndex * rackSpacing -
-                      ((numRacksPerRow - 1) * rackSpacing) / 2,
-                    0,
-                    rowIndex * rowSpacing - ((numRows - 1) * rowSpacing) / 4,
-                  ]}
-                  rackNumber={rackNumber}
-                />
-              );
-            })
-          )}
-          {/* Create multiple BillingCounters in a row */}
-          {Array.from({ length: numCounters }).map((_, index) => (
-            <BillingCounter
-              key={`counter-${index}`}
-              position={[-40 + index * counterSpacing, 0, -40]}
-              counterNumber={index + 1}
+            {/* Render the first Door at one position */}
+            <Door
+              position={[-40, 2.5, -47]}
+              rotation={[0, 8, 0]}
+              scale={[0.02, 0.02, 0.02]}
             />
-          ))}
-          <OrbitControls />
-        </Canvas>
-      )}
+            {/* Render the second Door at another position */}
+            <Door
+              position={[40, 3, -30]}
+              rotation={[0, 8, 0]}
+              scale={[0.02, 0.02, 0.02]}
+            />
+            {/* Multiple Rows (Columns) of Shopping Racks */}
+            {Array.from({ length: numRows }).map((_, rowIndex) =>
+              Array.from({ length: numRacksPerRow }).map((_, colIndex) => {
+                const rackNumber = rowIndex * numRacksPerRow + colIndex;
+
+                return (
+                  <ShoppingRack
+                    key={`rack-${rackNumber}`}
+                    position={[
+                      colIndex * rackSpacing -
+                        ((numRacksPerRow - 1) * rackSpacing) / 2,
+                      0,
+                      rowIndex * rowSpacing - ((numRows - 1) * rowSpacing) / 4,
+                    ]}
+                    rackNumber={rackNumber}
+                  />
+                );
+              })
+            )}
+            {/* Create multiple BillingCounters in a row */}
+            {Array.from({ length: numCounters }).map((_, index) => (
+              <BillingCounter
+                key={`counter-${index}`}
+                position={[-40 + index * counterSpacing, 0, -40]}
+                counterNumber={index + 1}
+              />
+            ))}
+            <OrbitControls />
+          </Canvas>
+        )}
+      </div>
     </div>
   );
 };
