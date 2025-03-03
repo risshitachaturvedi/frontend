@@ -1,117 +1,161 @@
-//without backend code
+//after adding velocity and position
 import React, { useState, useEffect } from "react";
-import ShoppingRack from "./components/ShoppingRack";
-import Door from "./components/Door";
-import BillingCounter from "./components/BillingCounter";
 import SensorPermission from "./components/SensorPermission";
-import Loading from "./components/Loading";
 import { Canvas } from "@react-three/fiber";
-//import ImuDisplay from "./components/ImuDisplay"; // Removed backend logic for IMU display
-import ErrorBoundary from "./components/ErrorBoundary"; // Retained for error handling
+import Avatar from "./components/Avatar";
+import Loading from "./components/Loading";
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true); // To track the loading state of the map
-  const [isPermissionGranted, setIsPermissionGranted] = useState(false); // Added state for permission
-  const floorSize = [88, 100];
-
-  // For ShoppingRack
-  const numRacksPerRow = 12; // Number of racks in a single row
-  const numRows = 7; // Number of rows (columns ke liye)
-  const rackSpacing = 8; // Spacing between racks in a row
-  const rowSpacing = 9; // Spacing between rows (to form columns)
-
-  const numCounters = 9; // Number of counters
-  const counterSpacing = 10; // Spacing between counters in the row
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
+  const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
 
   const handleMapLoaded = () => {
-    setIsLoading(false); // Set loading to false when the map is loaded
+    setIsLoading(false);
   };
 
-  const onPermissionGranted = () => {
+  const onPermissionGranted = (newVelocity, newPosition) => {
+    setVelocity(newVelocity);
+    setPosition(newPosition);
     setIsPermissionGranted(true);
-    setIsLoading(false); // Set isLoading to false once permission is granted
+    setIsLoading(false);
   };
 
   return (
     <div>
-      <div>
-        <button
-          className="z-10"
-          onClick={() => alert("You clicked the button!")}
+      <SensorPermission onPermissionGranted={onPermissionGranted} />
+      {isLoading && <Loading />}
+      {isPermissionGranted && !isLoading && (
+        <Canvas
+          camera={{ position: [0, 20, 20], fov: 60 }}
+          onCreated={() => handleMapLoaded()}
         >
-          hii
-        </button>
-        <SensorPermission onPermissionGranted={onPermissionGranted} />
-        <div />
-        {isLoading && <Loading />}
-        {/* Show Loading component if the map is still loading */}
-        {/* Render the Canvas only if the map is not loading */}
-        {isPermissionGranted && !isLoading && (
-          <Canvas
-            camera={{ position: [0, 20, 20], fov: 60 }}
-            onCreated={() => handleMapLoaded()}
-          >
-            {/* Your scene components */}
-            <ambientLight />
-            <pointLight position={[10, 20, 10]} intensity={1} />
-            {isPermissionGranted && <Avatar />}
-
-            {/* Other components */}
-            <Floor />
-            {/* Add the walls around the floor */}
-            <Wall floorSize={floorSize} side="top" />
-            <Wall floorSize={floorSize} side="bottom" />
-            <Wall floorSize={floorSize} side="left" />
-            <Wall floorSize={floorSize} side="right" />
-
-            {/* Render the first Door at one position */}
-            <Door
-              position={[-40, 2.5, -47]}
-              rotation={[0, 8, 0]}
-              scale={[0.02, 0.02, 0.02]}
-            />
-            {/* Render the second Door at another position */}
-            <Door
-              position={[40, 3, -30]}
-              rotation={[0, 8, 0]}
-              scale={[0.02, 0.02, 0.02]}
-            />
-            {/* Multiple Rows (Columns) of Shopping Racks */}
-            {Array.from({ length: numRows }).map((_, rowIndex) =>
-              Array.from({ length: numRacksPerRow }).map((_, colIndex) => {
-                const rackNumber = rowIndex * numRacksPerRow + colIndex;
-
-                return (
-                  <ShoppingRack
-                    key={`rack-${rackNumber}`}
-                    position={[
-                      colIndex * rackSpacing -
-                        ((numRacksPerRow - 1) * rackSpacing) / 2,
-                      0,
-                      rowIndex * rowSpacing - ((numRows - 1) * rowSpacing) / 4,
-                    ]}
-                    rackNumber={rackNumber}
-                  />
-                );
-              })
-            )}
-            {/* Create multiple BillingCounters in a row */}
-            {Array.from({ length: numCounters }).map((_, index) => (
-              <BillingCounter
-                key={`counter-${index}`}
-                position={[-40 + index * counterSpacing, 0, -40]}
-                counterNumber={index + 1}
-              />
-            ))}
-            <OrbitControls />
-          </Canvas>
-        )}
-      </div>
+          <ambientLight />
+          <pointLight position={[10, 20, 10]} intensity={1} />
+          <Avatar position={position} velocity={velocity} />
+        </Canvas>
+      )}
     </div>
   );
 };
 
 export default App;
+
+// //without backend code
+// import React, { useState, useEffect } from "react";
+// import ShoppingRack from "./components/ShoppingRack";
+// import Door from "./components/Door";
+// import BillingCounter from "./components/BillingCounter";
+// import SensorPermission from "./components/SensorPermission";
+// import Loading from "./components/Loading";
+// import { Canvas } from "@react-three/fiber";
+// //import ImuDisplay from "./components/ImuDisplay"; // Removed backend logic for IMU display
+// import ErrorBoundary from "./components/ErrorBoundary"; // Retained for error handling
+
+// const App = () => {
+//   const [isLoading, setIsLoading] = useState(true); // To track the loading state of the map
+//   const [isPermissionGranted, setIsPermissionGranted] = useState(false); // Added state for permission
+//   const floorSize = [88, 100];
+
+//   // For ShoppingRack
+//   const numRacksPerRow = 12; // Number of racks in a single row
+//   const numRows = 7; // Number of rows (columns ke liye)
+//   const rackSpacing = 8; // Spacing between racks in a row
+//   const rowSpacing = 9; // Spacing between rows (to form columns)
+
+//   const numCounters = 9; // Number of counters
+//   const counterSpacing = 10; // Spacing between counters in the row
+
+//   const handleMapLoaded = () => {
+//     setIsLoading(false); // Set loading to false when the map is loaded
+//   };
+
+//   const onPermissionGranted = () => {
+//     setIsPermissionGranted(true);
+//     setIsLoading(false); // Set isLoading to false once permission is granted
+//   };
+
+//   return (
+//     <div>
+//       <div>
+//         <button
+//           className="z-10"
+//           onClick={() => alert("You clicked the button!")}
+//         >
+//           hii
+//         </button>
+//         <SensorPermission onPermissionGranted={onPermissionGranted} />
+//         <div />
+//         {isLoading && <Loading />}
+//         {/* Show Loading component if the map is still loading */}
+//         {/* Render the Canvas only if the map is not loading */}
+//         {isPermissionGranted && !isLoading && (
+//           <Canvas
+//             camera={{ position: [0, 20, 20], fov: 60 }}
+//             onCreated={() => handleMapLoaded()}
+//           >
+//             {/* Your scene components */}
+//             <ambientLight />
+//             <pointLight position={[10, 20, 10]} intensity={1} />
+//             {isPermissionGranted && <Avatar />}
+
+//             {/* Other components */}
+//             <Floor />
+//             {/* Add the walls around the floor */}
+//             <Wall floorSize={floorSize} side="top" />
+//             <Wall floorSize={floorSize} side="bottom" />
+//             <Wall floorSize={floorSize} side="left" />
+//             <Wall floorSize={floorSize} side="right" />
+
+//             {/* Render the first Door at one position */}
+//             <Door
+//               position={[-40, 2.5, -47]}
+//               rotation={[0, 8, 0]}
+//               scale={[0.02, 0.02, 0.02]}
+//             />
+//             {/* Render the second Door at another position */}
+//             <Door
+//               position={[40, 3, -30]}
+//               rotation={[0, 8, 0]}
+//               scale={[0.02, 0.02, 0.02]}
+//             />
+//             {/* Multiple Rows (Columns) of Shopping Racks */}
+//             {Array.from({ length: numRows }).map((_, rowIndex) =>
+//               Array.from({ length: numRacksPerRow }).map((_, colIndex) => {
+//                 const rackNumber = rowIndex * numRacksPerRow + colIndex;
+
+//                 return (
+//                   <ShoppingRack
+//                     key={`rack-${rackNumber}`}
+//                     position={[
+//                       colIndex * rackSpacing -
+//                         ((numRacksPerRow - 1) * rackSpacing) / 2,
+//                       0,
+//                       rowIndex * rowSpacing - ((numRows - 1) * rowSpacing) / 4,
+//                     ]}
+//                     rackNumber={rackNumber}
+//                   />
+//                 );
+//               })
+//             )}
+//             {/* Create multiple BillingCounters in a row */}
+//             {Array.from({ length: numCounters }).map((_, index) => (
+//               <BillingCounter
+//                 key={`counter-${index}`}
+//                 position={[-40 + index * counterSpacing, 0, -40]}
+//                 counterNumber={index + 1}
+//               />
+//             ))}
+//             <OrbitControls />
+//           </Canvas>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default App;
 
 //with backend code
 // import React, { useEffect, useState } from "react";

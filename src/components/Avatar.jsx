@@ -1,76 +1,78 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useGLTF, useAnimations } from "@react-three/drei";
-import { Vector3 } from "three";
+//
 
-const Avatar = ({ sensorData }) => {
-  const modelUrl = "stylized_epic_bull_man_warrior_animated/scene.gltf"; // Hardcoded model URL
-  const { scene, animations } = useGLTF(modelUrl); // Load the model using the hardcoded URL
-  const { actions } = useAnimations(animations, scene); // Hook to handle animations
+// import React, { useEffect, useRef, useState } from "react";
+// import { useGLTF, useAnimations } from "@react-three/drei";
+// import { Vector3 } from "three";
 
-  const avatarRef = useRef(); // Reference to the avatar model
-  const [velocity, setVelocity] = useState(new Vector3(0, 0, 0)); // To track movement velocity
-  const [isMoving, setIsMoving] = useState(false); // To check if the model is moving
-  const [facingDirection, setFacingDirection] = useState("front"); // To track the direction the avatar is facing
+// const Avatar = ({ sensorData }) => {
+//   const modelUrl = "stylized_epic_bull_man_warrior_animated/scene.gltf"; // Hardcoded model URL
+//   const { scene, animations } = useGLTF(modelUrl); // Load the model using the hardcoded URL
+//   const { actions } = useAnimations(animations, scene); // Hook to handle animations
 
-  const speed = 0.1; // Movement speed
+//   const avatarRef = useRef(); // Reference to the avatar model
+//   const [velocity, setVelocity] = useState(new Vector3(0, 0, 0)); // To track movement velocity
+//   const [isMoving, setIsMoving] = useState(false); // To check if the model is moving
+//   const [facingDirection, setFacingDirection] = useState("front"); // To track the direction the avatar is facing
 
-  useEffect(() => {
-    if (sensorData && sensorData.accelerometer) {
-      // Assuming accelerometer data is passed through sensorData prop
-      const acceleration = sensorData.accelerometer;
-      const newVelocity = new Vector3(
-        acceleration.x * speed,
-        acceleration.y * speed,
-        -acceleration.z * speed
-      ); // Update velocity based on sensor data
+//   const speed = 0.1; // Movement speed
 
-      setVelocity(newVelocity); // Set velocity based on sensor input
-      setIsMoving(true); // The avatar is moving
-    }
-  }, [sensorData]);
+//   useEffect(() => {
+//     if (sensorData && sensorData.accelerometer) {
+//       // Assuming accelerometer data is passed through sensorData prop
+//       const acceleration = sensorData.accelerometer;
+//       const newVelocity = new Vector3(
+//         acceleration.x * speed,
+//         acceleration.y * speed,
+//         -acceleration.z * speed
+//       ); // Update velocity based on sensor data
 
-  useEffect(() => {
-    // Update position and handle animations
-    if (avatarRef.current) {
-      avatarRef.current.position.add(velocity); // Update position based on velocity
-    }
+//       setVelocity(newVelocity); // Set velocity based on sensor input
+//       setIsMoving(true); // The avatar is moving
+//     }
+//   }, [sensorData]);
 
-    if (isMoving && actions["4338274725888_TempMotion"]) {
-      actions["4338274725888_TempMotion"].play(); // Play walking animation
-    } else if (actions["4338274725888_TempMotion"]) {
-      actions["4338274725888_TempMotion"].stop(); // Stop walking animation
-    }
+//   useEffect(() => {
+//     // Update position and handle animations
+//     if (avatarRef.current) {
+//       avatarRef.current.position.add(velocity); // Update position based on velocity
+//     }
 
-    // Update avatar's facing direction based on velocity
-    if (avatarRef.current) {
-      if (velocity.x > 0) setFacingDirection("right");
-      else if (velocity.x < 0) setFacingDirection("left");
-      else if (velocity.z > 0) setFacingDirection("back");
-      else if (velocity.z < 0) setFacingDirection("front");
+//     if (isMoving && actions["4338274725888_TempMotion"]) {
+//       actions["4338274725888_TempMotion"].play(); // Play walking animation
+//     } else if (actions["4338274725888_TempMotion"]) {
+//       actions["4338274725888_TempMotion"].stop(); // Stop walking animation
+//     }
 
-      switch (facingDirection) {
-        case "front":
-          avatarRef.current.rotation.y = Math.PI; // Face forward
-          break;
-        case "back":
-          avatarRef.current.rotation.y = 0; // Face backward
-          break;
-        case "left":
-          avatarRef.current.rotation.y = -Math.PI / 2; // Face left
-          break;
-        case "right":
-          avatarRef.current.rotation.y = Math.PI / 2; // Face right
-          break;
-        default:
-          break;
-      }
-    }
-  }, [velocity, isMoving, actions, facingDirection]);
+//     // Update avatar's facing direction based on velocity
+//     if (avatarRef.current) {
+//       if (velocity.x > 0) setFacingDirection("right");
+//       else if (velocity.x < 0) setFacingDirection("left");
+//       else if (velocity.z > 0) setFacingDirection("back");
+//       else if (velocity.z < 0) setFacingDirection("front");
 
-  return <primitive object={scene} ref={avatarRef} />;
-};
+//       switch (facingDirection) {
+//         case "front":
+//           avatarRef.current.rotation.y = Math.PI; // Face forward
+//           break;
+//         case "back":
+//           avatarRef.current.rotation.y = 0; // Face backward
+//           break;
+//         case "left":
+//           avatarRef.current.rotation.y = -Math.PI / 2; // Face left
+//           break;
+//         case "right":
+//           avatarRef.current.rotation.y = Math.PI / 2; // Face right
+//           break;
+//         default:
+//           break;
+//       }
+//     }
+//   }, [velocity, isMoving, actions, facingDirection]);
 
-export default Avatar;
+//   return <primitive object={scene} ref={avatarRef} />;
+// };
+
+// export default Avatar;
 
 //Avatar codee working
 // // Avatar.js (Frontend component)
@@ -443,3 +445,26 @@ export default Avatar;
 // };
 
 // export default Avatar;
+
+//after adding velocity and position
+import React from "react";
+import { useFrame } from "@react-three/fiber";
+
+const Avatar = ({ position, velocity }) => {
+  useFrame(() => {
+    // Use position and velocity to update the avatar's position in real time
+    // Assuming `ref` is your avatar's 3D object in the scene
+    if (ref.current) {
+      ref.current.position.set(position.x, position.y, position.z);
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={[position.x, position.y, position.z]}>
+      <sphereGeometry args={[1]} />
+      <meshStandardMaterial color="blue" />
+    </mesh>
+  );
+};
+
+export default Avatar;
