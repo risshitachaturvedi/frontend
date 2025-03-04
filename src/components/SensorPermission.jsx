@@ -124,6 +124,8 @@ const SensorPermission = ({ onPermissionGranted }) => {
   );
 };
 
+export default SensorPermission;
+
 // // after adding deltaTime
 // import React, { useState, useEffect } from "react";
 
