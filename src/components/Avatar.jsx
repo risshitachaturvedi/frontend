@@ -510,7 +510,7 @@ import { useFrame } from "@react-three/fiber";
 const Avatar = ({ sensorData }) => {
   const modelUrl = "stylized_epic_bull_man_warrior_animated/scene.gltf"; // Hardcoded model URL
   const { scene, animations } = useGLTF(modelUrl); // Load the model using the hardcoded URL
-  const { actions } = useAnimations(animations, scene); // Hook to handle animations
+  // const { actions } = useAnimations(animations, scene); // Hook to handle animations
 
   const avatarRef = useRef(); // Reference to the avatar model
   const [velocity, setVelocity] = useState(new Vector3(0, 0, 0)); // To track movement velocity
@@ -521,66 +521,68 @@ const Avatar = ({ sensorData }) => {
   const speed = 0.1; // Movement speed
 
   // Update velocity from accelerometer data
-  useEffect(() => {
-    if (sensorData && sensorData.accelerometer) {
-      const acceleration = sensorData.accelerometer;
-      const newVelocity = new Vector3(
-        acceleration.x * speed,
-        acceleration.y * speed,
-        -acceleration.z * speed
-      ); // Update velocity based on sensor data
+  // useEffect(() => {
+  //   if (sensorData && sensorData.accelerometer) {
+  //     const acceleration = sensorData.accelerometer;
+  //     const newVelocity = new Vector3(
+  //       acceleration.x * speed,
+  //       acceleration.y * speed,
+  //       -acceleration.z * speed
+  //     ); // Update velocity based on sensor data
 
-      setVelocity(newVelocity); // Set velocity based on sensor input
-      setIsMoving(true); // The avatar is moving
-    }
-  }, [sensorData]);
+  //     setVelocity(newVelocity); // Set velocity based on sensor input
+  //     setIsMoving(true); // The avatar is moving
+  //   }
+  // }, [sensorData]);
 
   // Update position based on velocity
-  useFrame(() => {
-    setPosition((prevPosition) => prevPosition.add(velocity)); // Update position by adding velocity each frame
-  });
+  // useFrame(() => {
+  //   setPosition((prevPosition) => prevPosition.add(velocity)); // Update position by adding velocity each frame
+  // });
 
-  useEffect(() => {
-    // Handle animations based on movement
-    if (isMoving && actions["4338274725888_TempMotion"]) {
-      actions["4338274725888_TempMotion"].play(); // Play walking animation
-    } else if (actions["4338274725888_TempMotion"]) {
-      actions["4338274725888_TempMotion"].stop(); // Stop walking animation
-    }
+  // useEffect(() => {
+  //   // Handle animations based on movement
+  //   if (isMoving && actions["4338274725888_TempMotion"]) {
+  //     actions["4338274725888_TempMotion"].play(); // Play walking animation
+  //   } else if (actions["4338274725888_TempMotion"]) {
+  //     actions["4338274725888_TempMotion"].stop(); // Stop walking animation
+  //   }
 
-    // Update avatar's facing direction based on velocity
-    if (velocity.x > 0) setFacingDirection("right");
-    else if (velocity.x < 0) setFacingDirection("left");
-    else if (velocity.z > 0) setFacingDirection("back");
-    else if (velocity.z < 0) setFacingDirection("front");
+  //   // Update avatar's facing direction based on velocity
+  //   if (velocity.x > 0) setFacingDirection("right");
+  //   else if (velocity.x < 0) setFacingDirection("left");
+  //   else if (velocity.z > 0) setFacingDirection("back");
+  //   else if (velocity.z < 0) setFacingDirection("front");
 
-    // Update rotation based on facing direction
-    if (avatarRef.current) {
-      switch (facingDirection) {
-        case "front":
-          avatarRef.current.rotation.y = Math.PI; // Face forward
-          break;
-        case "back":
-          avatarRef.current.rotation.y = 0; // Face backward
-          break;
-        case "left":
-          avatarRef.current.rotation.y = -Math.PI / 2; // Face left
-          break;
-        case "right":
-          avatarRef.current.rotation.y = Math.PI / 2; // Face right
-          break;
-        default:
-          break;
-      }
-    }
-  }, [velocity, isMoving, actions, facingDirection]);
+  //   // Update rotation based on facing direction
+  //   if (avatarRef.current) {
+  //     switch (facingDirection) {
+  //       case "front":
+  //         avatarRef.current.rotation.y = Math.PI; // Face forward
+  //         break;
+  //       case "back":
+  //         avatarRef.current.rotation.y = 0; // Face backward
+  //         break;
+  //       case "left":
+  //         avatarRef.current.rotation.y = -Math.PI / 2; // Face left
+  //         break;
+  //       case "right":
+  //         avatarRef.current.rotation.y = Math.PI / 2; // Face right
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   }
+  // }, [velocity, isMoving, actions, facingDirection]);
 
   return (
-    <primitive
-      object={scene}
-      ref={avatarRef}
-      position={[position.x, position.y, position.z]}
-    />
+    <>
+      <primitive
+        object={scene}
+        ref={avatarRef}
+        position={[position.x, position.y, position.z]}
+      />
+    </>
   );
 };
 
