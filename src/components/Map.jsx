@@ -283,8 +283,8 @@ const Map = ({ isPermissionGranted, setIsPermissionGranted }) => {
           <ambientLight />
           <pointLight position={[10, 20, 10]} intensity={1} />
           {/* Avatar */}
-          <Avatar position={position} velocity={velocity} />
-          console.log("Rendering Avatar at position:", position);
+          {/* <Avatar position={position} velocity={velocity} />
+          console.log("Rendering Avatar at position:", position); */}
           {/* Floor */}
           <Floor />
           console.log("Rendering Floor with size:", floorSize);
