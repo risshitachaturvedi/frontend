@@ -1,41 +1,65 @@
-//for routes
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import SensorPermission from "./components/SensorPermission";
 import Map from "./components/Map";
-// import Loading from "./components/Loading";
 
 const App = () => {
   const [isPermissionGranted, setIsPermissionGranted] = useState(false);
-  // const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Hook for navigation
 
-  const onPermissionGranted = () => {
-    setIsPermissionGranted(true);
-  };
+  useEffect(() => {
+    console.log("App Mounted ✅");
+  }, []);
+
+  useEffect(() => {
+    console.log("isPermissionGranted updated:", isPermissionGranted);
+    if (isPermissionGranted) {
+      // Navigate to /map once permission is granted
+      navigate("/map");
+    }
+  }, [isPermissionGranted, navigate]);
 
   return (
-    <Router basename="/frontend">
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <SensorPermission onPermissionGranted={onPermissionGranted} />
-          }
-        />
-        <Route
-          path="/map"
-          element={
-            !isPermissionGranted ? (
-              <Map />
+    <Routes>
+      <Route
+        path="/frontend"
+        element={
+          <>
+            {console.log("Rendering SensorPermission Component")}
+            <SensorPermission
+              setIsPermissionGranted={setIsPermissionGranted}
+              isPermissionGranted={isPermissionGranted}
+            />
+          </>
+        }
+      />
+      <Route
+        path="/map"
+        element={
+          <>
+            {console.log("Rendering /map Route")}
+            {isPermissionGranted ? (
+              <>
+                {console.log("Permission granted ✅ Showing Map component")}
+                <Map
+                  setIsPermissionGranted={setIsPermissionGranted}
+                  isPermissionGranted={isPermissionGranted}
+                />
+              </>
             ) : (
               <div className="flex justify-center items-center h-screen">
                 <h2>Please grant permission to view the map.</h2>
               </div>
-            )
-          }
-        />
-      </Routes>
-    </Router>
+            )}
+          </>
+        }
+      />
+    </Routes>
   );
 };
 

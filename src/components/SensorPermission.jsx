@@ -1256,8 +1256,8 @@ class KalmanFilter {
   }
 }
 
-const SensorPermission = ({ onPermissionGranted }) => {
-  const [isPermissionGranted, setIsPermissionGranted] = useState(false);
+const SensorPermission = ({isPermissionGranted,setIsPermissionGranted}) => {
+  // const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [sensorData, setSensorData] = useState({
     accelerometer: { x: 0, y: 0, z: 0 },
     gyroscope: { alpha: 0, beta: 0, gamma: 0 },
@@ -1301,7 +1301,6 @@ const SensorPermission = ({ onPermissionGranted }) => {
       console.log("DeviceMotionEvent.requestPermission not available, granting permission automatically");
       setIsPermissionGranted(true);
       startSensorListeners();
-      onPermissionGranted(); // Notify App.jsx that permission is granted
     }
   };
 
@@ -1425,7 +1424,7 @@ const SensorPermission = ({ onPermissionGranted }) => {
       )}
 
       {/* Pass sensorData to Avatar component */}
-      {isPermissionGranted && <Avatar sensorData={sensorData} />}
+      {/* {isPermissionGranted && <Avatar sensorData={sensorData} />} */}
     </div>
   );
 };
