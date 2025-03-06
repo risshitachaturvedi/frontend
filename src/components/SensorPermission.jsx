@@ -1219,11 +1219,6 @@
 
 // // export default SensorPermission;
 
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import Avatar from "./Avatar";
 
@@ -1251,12 +1246,17 @@ class KalmanFilter {
     // Update estimation error covariance
     this.P = (1 - this.K) * this.P;
 
-    console.log("KalmanFilter update - Measurement:", measurement, "Estimated value:", this.X);
+    console.log(
+      "KalmanFilter update - Measurement:",
+      measurement,
+      "Estimated value:",
+      this.X
+    );
     return this.X;
   }
 }
 
-const SensorPermission = ({isPermissionGranted,setIsPermissionGranted}) => {
+const SensorPermission = ({ isPermissionGranted, setIsPermissionGranted }) => {
   // const [isPermissionGranted, setIsPermissionGranted] = useState(false);
   const [sensorData, setSensorData] = useState({
     accelerometer: { x: 0, y: 0, z: 0 },
@@ -1298,7 +1298,9 @@ const SensorPermission = ({isPermissionGranted,setIsPermissionGranted}) => {
       }
     } else {
       // If 'requestPermission' is not available, grant permission automatically
-      console.log("DeviceMotionEvent.requestPermission not available, granting permission automatically");
+      console.log(
+        "DeviceMotionEvent.requestPermission not available, granting permission automatically"
+      );
       setIsPermissionGranted(true);
       startSensorListeners();
     }
@@ -1319,7 +1321,11 @@ const SensorPermission = ({isPermissionGranted,setIsPermissionGranted}) => {
     const filteredY = kalmanY.update(acceleration.y || 0);
     const filteredZ = kalmanZ.update(acceleration.z || 0);
 
-    console.log("Filtered acceleration data:", { x: filteredX, y: filteredY, z: filteredZ });
+    console.log("Filtered acceleration data:", {
+      x: filteredX,
+      y: filteredY,
+      z: filteredZ,
+    });
 
     // Update the accelerometer data
     setSensorData((prevData) => ({
@@ -1381,6 +1387,11 @@ const SensorPermission = ({isPermissionGranted,setIsPermissionGranted}) => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white p-4">
+      {/* <img src="/darthvader.jpg" alt="darthvader" /> */}
+      {/* <div className="w-[20vw] h-[20vh] bg-[url(/darthvader.jpg)] bg-cover border-2 border-black text-red-500">
+        hello
+      </div> */}
+
       <h1 className="text-2xl font-bold mb-4">Sensor Permission</h1>
       {!isPermissionGranted ? (
         <button

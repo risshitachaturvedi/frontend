@@ -217,6 +217,7 @@
 
 // export default Map;
 
+///This is the good final code
 import React, { useState } from "react";
 import "../App.css";
 import { Canvas } from "@react-three/fiber";
@@ -277,7 +278,7 @@ const Map = ({ isPermissionGranted, setIsPermissionGranted }) => {
       {isPermissionGranted && (
         <Canvas
           camera={{ position: [0, 20, 20], fov: 60 }}
-          onPointerMissed={handleMapLoaded}
+          // onPointerMissed={handleMapLoaded}
         >
           {/* Lights */}
           <ambientLight />
