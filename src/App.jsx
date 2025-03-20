@@ -27,7 +27,7 @@ const App = () => {
   return (
       <Routes>
         <Route 
-          path="/frontend" 
+          path="/" 
           element={
             <PermissionHandler 
               setIsPermissionGranted={setIsPermissionGranted} 
